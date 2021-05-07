@@ -18,71 +18,62 @@ public class TimeZoneConversion {
 		// TODO Auto-generated method stub
 
 		Instant nowUTc = Instant.now();
-		System.out.println(nowUTc);
+		System.out.println("UTC Time : "+nowUTc);
 		LocalDateTime ldt = LocalDateTime.now();
 		System.out.println(ldt);
 		ZoneId zd = ZoneId.systemDefault();
-		System.out.println(zd.getId());
+		System.out.println("Local Machine TIme :"+zd.getId());
 //		zd.of("Asia/Shanghai");
 		ZoneId xh = ZoneId.of("Asia/Shanghai");
-//		Set<String> zoneset = ZoneId.getAvailableZoneIds();
-//		for(String s:zoneset) {
-//			System.out.println(s);
-//		}
 		LocalDateTime cdt = LocalDateTime.now(xh);
-		System.out.println(cdt.toString());
+		System.out.println("China Time :"+cdt.toString());
 		DateTimeFormatter fd = DateTimeFormatter.ofPattern("HH:mm:ss");
-		String input = "17:24";
-//		LocalDateTime.
-//		System.out.println(LocalDateTime.parse(input));
-//		ZonedDateTime  zdt =  LocalDateTime.parse(input, fd).atZone(xh);
-//		System.out.println(zdt);
-//		System.out.println(cdt.format(fd));
-//		System.out.println(ldt.atZone(xh));
-//		System.out.println();
-//		String d = convertBetweenTwoTimeZone(new Date(), "Asia/Calcutta", "Asia/Shanghai");
-//		System.out.println(LocalDateTime.);
-		String s[] = input.split(":");
-		int hour = Integer.valueOf(s[0]);
-		int min = Integer.valueOf(s[1]);
-		LocalDateTime dd = LocalDateTime.of(YearMonth.now().getYear(),YearMonth.now().getMonth(),LocalDate.now().getDayOfMonth(),hour,min);
-		System.out.println(dd.format(fd));
-		Instant im = dd.atZone(ZoneId.of("Asia/Calcutta")).toInstant();
-		System.out.println(im);
-		convertBetweenTwoTimeZone(im, "Asia/Shanghai", "America/New_York");
+		String input = "18:00";
+
+		ZoneId chinaZone = ZoneId.of("Asia/Shanghai");
+		ZoneId usaZone = ZoneId.of("America/New_York");
+		ZoneId indiaZone = ZoneId.of("Asia/Calcutta");
+		convertTimeToZone(indiaZone, input);
 	}
 
-//	public static String convertTimeToZone(ZoneId targetId, String timetochange) {
-//		try {
-////			
-//			String s[] = timetochange.split(":");
-//			int hour = Integer.valueOf(s[0]);
-//			int min = Integer.valueOf(s[1]);
-//			LocalDateTime dd = LocalDateTime.of(YearMonth.now().getYear(),YearMonth.now().getMonth(),LocalDate.now().getDayOfMonth(),hour,min);
-//			ZonedDateTime dt =  dd.atZone(targetId).toInstant();
-//			System.out.println(dt.format(DateTimeFormatter.ofPattern("HH:mm:ss")));
-//			
-//		}catch (Exception e) {
-//			// TODO: handle exception
-//			e.printStackTrace();
-//		}
-//		return null;
-//	}
-	 public static String convertBetweenTwoTimeZone(Instant date, String fromTimeZone, String toTimeZone) {
-	        ZoneId fromTimeZoneId = ZoneId.of(fromTimeZone);
-	        ZoneId toTimeZoneId = ZoneId.of(toTimeZone);
-
-	        ZonedDateTime fromZonedDateTime =
-	                ZonedDateTime.ofInstant(date, ZoneId.systemDefault()).withZoneSameLocal(fromTimeZoneId);
-
-	        ZonedDateTime toZonedDateTime = fromZonedDateTime
-	                .withZoneSameInstant(toTimeZoneId)
-	                .withZoneSameLocal(ZoneId.systemDefault())
-	                ;
-
-	        System.out.println(toZonedDateTime.format(DateTimeFormatter.ofPattern("HH:mm")));
-//	        return Date.from(toZonedDateTime.toInstant());
-	        return null;
-	    }
+	public static String convertTimeToZone(ZoneId targetId, String timetochange) {
+		String otpTime = "";
+		try {
+			DateTimeFormatter fd = DateTimeFormatter.ofPattern("HH:mm");
+			String[] dt = timetochange.split(":");
+			int hour = Integer.valueOf(dt[0]);
+			int minute = Integer.valueOf(dt[1]);
+			// construct localdatetime from above time for given timezone
+			LocalDateTime givenTime = LocalDateTime.of(YearMonth.now().getYear(),YearMonth.now().getMonth(),LocalDate.now().getDayOfMonth(),hour,minute);
+			System.out.println("Given time :"+givenTime);
+			Instant instantTime= givenTime.atZone(targetId).toInstant();
+			System.out.println("Instant time :"+instantTime);
+			ZoneId serverZone = ZoneId.systemDefault();		// Server TimeZone
+			ZonedDateTime fromZoneDateTime = ZonedDateTime.of(givenTime, targetId).withZoneSameLocal(targetId);	// From given timezone 
+			ZonedDateTime toZoneDateTime = fromZoneDateTime.withZoneSameInstant(serverZone);	// to Server timezone
+			System.out.println(toZoneDateTime.format(fd));
+			otpTime = toZoneDateTime.format(fd);
+		}catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+		return otpTime;
+	}
+//	 public static String convertBetweenTwoTimeZone(Instant date, String fromTimeZone, String toTimeZone) {
+//	        ZoneId fromTimeZoneId = ZoneId.of(fromTimeZone);
+//	        ZoneId toTimeZoneId = ZoneId.of(toTimeZone);
+//
+//	        ZonedDateTime fromZonedDateTime =
+//	                ZonedDateTime.ofInstant(date, ZoneId.systemDefault()).withZoneSameLocal(fromTimeZoneId);
+//
+//	        ZonedDateTime toZonedDateTime = fromZonedDateTime
+//	                .withZoneSameInstant(toTimeZoneId)
+//	                .withZoneSameLocal(ZoneId.systemDefault());
+//	                
+//
+//	        System.out.println(toZonedDateTime.format(DateTimeFormatter.ofPattern("HH:mm")));
+////	        return Date.from(toZonedDateTime.toInstant());
+//	        return null;
+//	    }
 	
 }
